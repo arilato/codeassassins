@@ -120,8 +120,8 @@ def set_round_message(round_n: int, round_start: str, round_end: str):
 
 # sets up thanos message
 def set_thanos_message():
-	return "You have been snapped by Thanos for not contributing to his cause!\n \
-		(You did not kill anyone this round so you died). "
+	return "You have been snapped by Thanos for not contributing to his cause!\n" + \
+		"(You did not kill anyone this round so you died). "
 
 def set_channel_kill_message(player1: str, player2: str):
 	if player1 == "Thanos":
@@ -160,7 +160,7 @@ def set_codeword_message(code: str):
 	return message_text
 
 def create_welcome_message():
-	message_text = "@channel \nHello assassins! The game has just begun, and everyone should have a target. " + \
+	message_text = "<!channel>\nHello assassins! The game has just begun, and everyone should have a target. " + \
 				   "A quick refresher on the rules (full details can be found on the rulebook pinned " + \
 				   "in this channel): \n1. You must kill once per round, or you will be snapped away.\n" + \
 				   "2. You must touch your target with the assassination weapon to assassinate them. " + \
