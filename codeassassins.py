@@ -233,12 +233,16 @@ def process_message(**payload):
 if __name__ == "__main__":
 	global game
 
-	with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
-		game = Game(channel = "code-assassins", weapon = "fork", shield = "spoon")
-		#game = load_game()
+	with open('stdout.log', 'w') as stdout, redirect_stdout(stdout):
+		with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
+			#game = Game(channel = "code-assassins", weapon = "fork", shield = "spoon")
+			game = load_game()
+			while(1):
+				rtm_client =  slack.RTMClient(token=utils.get_oauth_token())
+				rtm_client.start()
+		print("Done at %s" % date.today().strftime("%B %d, %Y"))
 
-		rtm_client =  slack.RTMClient(token=utils.get_oauth_token())
-		rtm_client.start()
+
 
 
 
