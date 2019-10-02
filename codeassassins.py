@@ -10,7 +10,6 @@ from datetime import date
 char_min = 5
 dictionary = utils.load_dictionary(char_min=char_min)
 save_file = "SAVEFILE.pkl"
-kill_command = "!kill"
 
 class User:
 	def __init__(self, name: str, id_: str):
@@ -60,6 +59,9 @@ class Game:
 			message = utils.set_target_message(player.target.name) + "\n"
 			message += utils.set_codeword_message(player.code)
 			utils.send_users_message([player.id], message)
+
+		# Message channel
+		utils.send_channel_message(self.channel_id, utils.create_welcome_message())
 
 		# save game state
 		save_game(self)
@@ -119,12 +121,16 @@ class Game:
 				utils.send_channel_message(self.channel_id, \
 					utils.set_channel_kill_message("Thanos", player.target.name))	
 				players_to_remove.append(player)			
-				self.players_dead.append(player)
+				self.players_dead.append(player)				
 			player.has_killed = False
-		save_game(self)
 
 		for player in players_to_remove:
+			player.death_date = date.today().strftime("%B %d, %Y")
+			player.killer = "Thanos"
+			player.alive = False
 			self.players_alive.remove(player)
+
+		save_game(self)
 		self.check()
 
 
@@ -155,10 +161,9 @@ def process_message(**payload):
 	if len(message_words) == 0:
 		return
 
-	if message_words[0] == "!kill" and len(message_words) > 1:
-		if len(message_words) >= 2:
-			code = message_words[1]
-			return game.kill(user, code)
+	elif message_words[0] == "!kill" and len(message_words) > 1:
+		code = message_words[1]
+		game.kill(user, code)
 
 	elif message_words[0] == "!weapon":
 		utils.send_users_message([user], utils.set_weapon_message(game.weapon))
@@ -173,16 +178,24 @@ def process_message(**payload):
 		for player in game.players_alive + game.players_dead:
 			if player.id == user:
 				utils.send_users_message([user], player.get_status_string())
+				return
+		utils.send_users_message([user], "You were never playing! Your status is lame.")
 
 	elif message_words[0] == "!target":
 		for player in game.players_alive:
 			if player.id == user:
 				utils.send_users_message([user], utils.set_target_message(player.target.name))
+				return
+		utils.send_users_message([user], "You have no target - you're dead.")
 
 	elif message_words[0] == "!alive":
 		message = "Currently alive: \n"
 		for player in  game.players_alive:
 			message += "%s\n" % player.name
+		utils.send_users_message([user], message)
+
+	elif message_words[0] == "!help":
+		utils.send_users_message([user], utils.create_help_message())
 
 	elif user == game.admin_id and len(message_words) > 0:
 		print("Admin speaking")
@@ -211,7 +224,8 @@ def process_message(**payload):
 		save_game(game)
 
 	else:
-		utils.send_users_message([user], "Unrecognized command! Or maybe unformatted. I'm disappointed.")
+		utils.send_users_message([user], "Unrecognized command! Or maybe unformatted. I'm disappointed." + \
+										 "Message !help for a list of available commands!")
 
 
 if __name__ == "__main__":
