@@ -6,7 +6,7 @@ import utils
 import pickle
 import slack
 from datetime import date
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 
 
 char_min = 5
