@@ -6,6 +6,8 @@ import utils
 import pickle
 import slack
 from datetime import date
+from contextlib import redirect_stderr
+
 
 char_min = 5
 dictionary = utils.load_dictionary(char_min=char_min)
