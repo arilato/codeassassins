@@ -24,7 +24,7 @@ def get_admin_token(file_name: str = admin_file_name):
 		return re.sub(r'[^a-zA-Z0-9-]+', '', f.readline())
 
 TOKEN = get_oauth_token()
-ADMIN = get_admin_token()
+#ADMIN = get_admin_token()
 
 ###########################################################################
 #								DICTIONARY			 					  #
