@@ -42,6 +42,8 @@ class Game:
 		self.channel = channel
 		self.channel_id = utils.get_channel_id(self.channel)
 		self.admin_id = "U94MD12MV"
+		self.end_string = "My job is done. They will now engage in a sockfight to" + \
+				" the death at the next social."
 
 		# initialize players
 		member_ids, member_names = utils.get_channel_members(channel)
@@ -61,6 +63,13 @@ class Game:
 
 		# save game state
 		save_game(self)
+
+	def check(self):
+		if len(self.players_alive) == 2:
+			utils.send_channel_message(game.channel_id, "There are only two players left - %s and %s!" % 
+				(self.players_alive[0].name, self.players_alive[1].name))
+			utils.send_channel_message(game.channel_id, self.end_string)
+
 
 	# user is id, not name
 	def kill(self, user: str, code: str):
@@ -88,6 +97,7 @@ class Game:
 					message = utils.set_new_target_message(player.target.name)
 					utils.send_users_message([user], message)
 					save_game(self)
+					self.check()
 					return 1
 				else:
 					message = utils.set_fail_kill_message(player.target.name)
@@ -115,6 +125,7 @@ class Game:
 
 		for player in players_to_remove:
 			self.players_alive.remove(player)
+		self.check()
 
 
 def save_game(game: Game):
@@ -168,6 +179,11 @@ def process_message(**payload):
 			if player.id == user:
 				utils.send_users_message([user], utils.set_target_message(player.target.name))
 
+	elif message_words[0] == "!alive":
+		message = "Currently alive: \n"
+		for player in  game.players_alive:
+			message += "%s\n" % player.name
+
 	elif user == game.admin_id and len(message_words) > 0:
 		print("Admin speaking")
 		if message_words[0] == "!round_end" and len(message_words) >= 2:
@@ -182,16 +198,17 @@ def process_message(**payload):
 				if player.has_killed == False:
 					ndie += 1
 			utils.send_users_message([game.admin_id], "%d die, %d total" %  (ndie, len(game.players_alive)))
-		elif message_words[0] == "!weapon":
+		elif message_words[0] == "!set_weapon":
 			game.weapon = message[len(message_words[0]) + 1:]
 			utils.send_channel_message(game.channel_id, "The weapon has been updated to %s!" \
-				% game.round_end)
-		elif message_words[0] == "!shield":
+				% game.weapon)
+		elif message_words[0] == "!set_shield":
 			game.shield = message[len(message_words[0]) + 1:]
 			utils.send_channel_message(game.channel_id, "The shield has been updated to %s!" \
-				% game.round_end)
+				% game.shield)
+		elif message_words[0] == "!set_end_words":
+			game.end_string = message[len(message_words[0]) + 1:]
 		save_game(game)
-
 
 	else:
 		utils.send_users_message([user], "Unrecognized command! Or maybe unformatted. I'm disappointed.")
