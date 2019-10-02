@@ -159,10 +159,28 @@ def set_codeword_message(code: str):
 	message_text += "this codeword can take you out of the game!"
 	return message_text
 
-def create_welcome_message(user_names: [str], user_ids: [str]):
-	message_text = "Hello " + ("<@%s>, " * (len(user_ids) - 1)) % tuple(user_ids[:-1])
-	message_text = message_text[:-2] + " and <@%s>!" % user_ids[-1]
-	message_text += "\n #TODO: Welcome message"
+def create_welcome_message():
+	message_text = "Hello assassins! The game has just begun, and everyone should have a target. " + \
+				   "A quick refresher on the rules (full details can be found on the rulebook pinned " + \
+				   "in this channel): \n1. You must kill once per round, or you will be snapped away.\n" + \
+				   "2. You must touch your target with the assassination weapon to assassinate them. " + \
+				   "If they are holding the shield item, they are protected from you. You *cannot* tape " + \
+				   "a shield item to yourself, or stick it to you, etc. You *must hold it*.\n 3. " + \
+				   "Everyone has a codeword that they must protect. If you get assassinated, you must " + \
+				   "give your codeword to your assassin, so they can verify they assassinated you.\n" + \
+				   "4. Post a selfie with your target when you assassinate them to this channel!\n5. " + \
+				   "When there are two players left, we will have a special event prepared.\n" + \
+				   "That's all, and happy hunting!"
+	return message_text
+
+def create_help_message():
+	message_text = "Your possible commands are:\n" + \
+				   "1. *!weapon* - shows the current round's assassination weapon.\n" + \
+				   "2. *!shield* - shows the current round's assassination shield.\n" + \
+				   "3. *!round* - shows the current round's information.\n" + \
+				   "4. *!status* - shows your current status.\n" + \
+				   "5. *!target* - shows who your current target is.\n" + \
+				   "6. *!kill <code>* - kills your target, given their code. \n"
 	return message_text
 
 

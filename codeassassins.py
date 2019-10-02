@@ -68,7 +68,7 @@ class Game:
 
 	def check(self):
 		if len(self.players_alive) == 2:
-			utils.send_channel_message(game.channel_id, "There are only two players left - %s and %s!" % 
+			utils.send_channel_message(game.channel_id, "@channel\nThere are only two players left - %s and %s!" % 
 				(self.players_alive[0].name, self.players_alive[1].name))
 			utils.send_channel_message(game.channel_id, self.end_string)
 
@@ -203,7 +203,7 @@ def process_message(**payload):
 			game.end_round(message[len(message_words[0]) + 1:])
 		elif message_words[0] == "!new_round_date" and len(message_words) >= 2:
 			game.round_end = message[len(message_words[0]) + 1:]
-			utils.send_channel_message(game.channel_id, "The round end date has been updated to %s!" \
+			utils.send_channel_message(game.channel_id, "@channel\nThe round end date has been updated to %s!" \
 				% game.round_end)
 		elif message_words[0] == "!will_die":
 			ndie = 0
@@ -213,11 +213,11 @@ def process_message(**payload):
 			utils.send_users_message([game.admin_id], "%d die, %d total" %  (ndie, len(game.players_alive)))
 		elif message_words[0] == "!set_weapon":
 			game.weapon = message[len(message_words[0]) + 1:]
-			utils.send_channel_message(game.channel_id, "The weapon has been updated to %s!" \
+			utils.send_channel_message(game.channel_id, "@channel\nThe weapon has been updated to %s!" \
 				% game.weapon)
 		elif message_words[0] == "!set_shield":
 			game.shield = message[len(message_words[0]) + 1:]
-			utils.send_channel_message(game.channel_id, "The shield has been updated to %s!" \
+			utils.send_channel_message(game.channel_id, "@channel\nThe shield has been updated to %s!" \
 				% game.shield)
 		elif message_words[0] == "!set_end_words":
 			game.end_string = message[len(message_words[0]) + 1:]
