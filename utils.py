@@ -57,7 +57,7 @@ def get_channel_id(name: str):
 	r = requests.get(url = URL, params = PARAMS)
 	data = r.json()
 	for ch in data['channels']:
-		if ch['name'] == 'test-slackbots':
+		if ch['name'] == name:
 			return ch['id']
 	return -1
 
