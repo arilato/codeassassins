@@ -112,8 +112,9 @@ class Game:
 	def end_round(self, new_round_date: str):
 		self.round += 1
 		self.round_start = date.today().strftime("%B %d, %Y")
-		self.round_end = new_round_date
-
+                self.round_end = new_round_date
+                utils.send_channel_message(self.channel_id, "Round %d has ended! The new round " + \
+                                            "will start on %s." % (self.round-1, self.round_end))
 		players_to_remove = []
 
 		for player in self.players_alive:
@@ -121,7 +122,7 @@ class Game:
 			if player.has_killed == False:  # hasn't killed, kill the player
 				utils.send_users_message([player.id], utils.set_thanos_message())
 				utils.send_channel_message(self.channel_id, \
-					utils.set_channel_kill_message("Thanos", player.target.name))	
+					utils.set_channel_kill_message("Thanos", player.name))	
 				players_to_remove.append(player)			
 				self.players_dead.append(player)				
 			player.has_killed = False
@@ -232,7 +233,7 @@ def process_message(**payload):
 
 if __name__ == "__main__":
 	global game
-
+        '''
 	with open('stdout.log', 'w') as stdout, redirect_stdout(stdout):
 		with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
 			#game = Game(channel = "code-assassins", weapon = "fork", shield = "spoon")
@@ -241,8 +242,7 @@ if __name__ == "__main__":
 				rtm_client =  slack.RTMClient(token=utils.get_oauth_token())
 				rtm_client.start()
 		print("Done at %s" % date.today().strftime("%B %d, %Y"))
-
-
+        '''
 
 
 
