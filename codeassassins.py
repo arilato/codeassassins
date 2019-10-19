@@ -48,7 +48,11 @@ class Game:
 
 		# initialize players
 		member_ids, member_names = utils.get_channel_members(channel)
+		# hacky hack - remove this later
+		ids_to_keep = ['U71HKFGN8', 'U72JTTFRV', 'U93GUCN11', 'U93KQKVDY', 'UN4ELBDCH', 'UNASP8UQM']
 		for id_, name in zip(member_ids, member_names):
+			if id_ not in ids_to_keep:
+				continue
 			self.players_alive.append(User(name, id_))
 
 		# set targets by creating random permutation
@@ -233,19 +237,14 @@ def process_message(**payload):
 
 if __name__ == "__main__":
 	global game
-	game = load_game()
-	for player in game.players_dead:
-		print(player.id, player.name)
-	'''
 	with open('stdout.log', 'w') as stdout, redirect_stdout(stdout):
 		with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
-			#game = Game(channel = "code-assassins", weapon = "fork", shield = "spoon")
-			game = load_game()
+			game = Game(channel = "code-assassins", weapon = "chicken egg", shield = "banana")
+			#game = load_game()
 			while(1):
 				rtm_client =  slack.RTMClient(token=utils.get_oauth_token())
 				rtm_client.start()
 		print("Done at %s" % date.today().strftime("%B %d, %Y"))
-	'''
 
 
 
