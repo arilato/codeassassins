@@ -233,6 +233,9 @@ def process_message(**payload):
 
 if __name__ == "__main__":
 	global game
+	game = load_game()
+	for player in game.players_dead:
+		print(player.id, player.name)
 	'''
 	with open('stdout.log', 'w') as stdout, redirect_stdout(stdout):
 		with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
