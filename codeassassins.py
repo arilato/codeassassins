@@ -112,8 +112,8 @@ class Game:
 	def end_round(self, new_round_date: str):
 		self.round += 1
 		self.round_start = date.today().strftime("%B %d, %Y")
-                self.round_end = new_round_date
-                utils.send_channel_message(self.channel_id, "Round %d has ended! The new round " + \
+		self.round_end = new_round_date
+		utils.send_channel_message(self.channel_id, "Round %d has ended! The new round " + \
                                             "will start on %s." % (self.round-1, self.round_end))
 		players_to_remove = []
 
