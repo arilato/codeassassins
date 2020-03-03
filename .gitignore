@@ -15,6 +15,9 @@ downloads/
 eggs/
 .eggs/
 lib/
+tcl/
+include/
+scripts/
 lib64/
 parts/
 sdist/
@@ -89,6 +92,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+scripts/
 
 # Spyder project settings
 .spyderproject
@@ -102,3 +106,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.vscode/
+
+.git
+

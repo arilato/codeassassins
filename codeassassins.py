@@ -5,9 +5,9 @@ import json
 import utils
 import pickle
 import slack
+import asyncio
 from datetime import date
 from contextlib import redirect_stderr, redirect_stdout
-
 
 char_min = 5
 dictionary = utils.load_dictionary(char_min=char_min)
@@ -154,6 +154,7 @@ def load_game():
 @slack.RTMClient.run_on(event='message')
 def process_message(**payload):
 	data = payload['data']
+	print(data)
 	web_client = payload['web_client']
 	rtm_client = payload['rtm_client']
 
@@ -237,14 +238,14 @@ def process_message(**payload):
 
 if __name__ == "__main__":
 	global game
-	with open('stdout.log', 'w') as stdout, redirect_stdout(stdout):
-		with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
-			game = Game(channel = "code-assassins", weapon = "chicken egg", shield = "banana")
-			#game = load_game()
-			while(1):
-				rtm_client =  slack.RTMClient(token=utils.get_oauth_token())
-				rtm_client.start()
-		print("Done at %s" % date.today().strftime("%B %d, %Y"))
+	# with open('stdout.log', 'w') as stdout, redirect_stdout(stdout):
+	# 	with open('errors.log', 'w') as stderr, redirect_stderr(stderr):
+	game = Game(channel = "test-codeassassin", weapon = "chicken egg", shield = "banana")
+	#game = load_game()
+	while(1):
+		rtm_client =  slack.RTMClient(token=utils.get_oauth_token())
+		rtm_client.start()
+	print("Done at %s" % date.today().strftime("%B %d, %Y"))
 
 
 
