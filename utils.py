@@ -55,7 +55,6 @@ def get_channel_id(name: str):
 		'limit': 1000,
 	}
 	r = requests.get(url = URL, params = PARAMS)
-	print(r.content)
 	data = r.json()
 	for ch in data['channels']:
 		if ch['name'] == name:

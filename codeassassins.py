@@ -42,18 +42,19 @@ class Game:
 		self.shield = shield
 		self.channel = channel
 		self.channel_id = utils.get_channel_id(self.channel)
-		self.admin_id = "U94MD12MV"
+		self.admin_id = 'U93KQKVDY'
 		self.end_string = "My job is done. They will now engage in a sockfight to" + \
 				" the death at the next social."
 
 		# initialize players
 		member_ids, member_names = utils.get_channel_members(channel)
 		# hacky hack - remove this later
-		ids_to_keep = ['U71HKFGN8', 'U72JTTFRV', 'U93GUCN11', 'U93KQKVDY', 'UN4ELBDCH', 'UNASP8UQM']
+		# ids_to_keep = ['U71HKFGN8', 'U72JTTFRV', 'U93GUCN11', 'U93KQKVDY', 'UN4ELBDCH', 'UNASP8UQM']
 		for id_, name in zip(member_ids, member_names):
-			if id_ not in ids_to_keep:
-				continue
+			# if id_ in ids_to_keep:
+			# 	print(name)
 			self.players_alive.append(User(name, id_))
+		print(self.players_alive)
 
 		# set targets by creating random permutation
 		perm = np.random.permutation(len(self.players_alive))
@@ -70,13 +71,15 @@ class Game:
 		utils.send_channel_message(self.channel_id, utils.create_welcome_message())
 
 		# save game state
+		print(self.players_alive)
+		self.check()
 		save_game(self)
 
 	def check(self):
 		if len(self.players_alive) == 2:
-			utils.send_channel_message(game.channel_id, "<!channel>\nThere are only two players left - %s and %s!" % 
+			utils.send_channel_message(self.channel_id, "<!channel>\nThere are only two players left - %s and %s!" % 
 				(self.players_alive[0].name, self.players_alive[1].name))
-			utils.send_channel_message(game.channel_id, self.end_string)
+			utils.send_channel_message(self.channel_id, self.end_string)
 
 
 	# user is id, not name
@@ -154,7 +157,6 @@ def load_game():
 @slack.RTMClient.run_on(event='message')
 def process_message(**payload):
 	data = payload['data']
-	print(data)
 	web_client = payload['web_client']
 	rtm_client = payload['rtm_client']
 
@@ -165,76 +167,81 @@ def process_message(**payload):
 		return
 
 	# check prefixes
-	message_words = message.split()
-	if len(message_words) == 0:
-		return
 
-	elif message_words[0] == "!kill" and len(message_words) > 1:
-		code = message_words[1]
-		game.kill(user, code)
+	try:
+		message_words = message.split()
+		if len(message_words) == 0:
+			return
 
-	elif message_words[0] == "!weapon":
-		utils.send_users_message([user], utils.set_weapon_message(game.weapon))
+		elif message_words[0] == "!kill" and len(message_words) > 1:
+			code = message_words[1]
+			game.kill(user, code)
 
-	elif message_words[0] == "!shield":
-		utils.send_users_message([user], utils.set_shield_message(game.shield))
+		elif message_words[0] == "!weapon":
+			utils.send_users_message([user], utils.set_weapon_message(game.weapon))
 
-	elif message_words[0] == "!round":
-		utils.send_users_message([user], utils.set_round_message(game.round, game.round_start, game.round_end))
+		elif message_words[0] == "!shield":
+			utils.send_users_message([user], utils.set_shield_message(game.shield))
 
-	elif message_words[0] == "!status":
-		for player in game.players_alive + game.players_dead:
-			if player.id == user:
-				utils.send_users_message([user], player.get_status_string())
-				return
-		utils.send_users_message([user], "You were never playing! Your status is lame.")
+		elif message_words[0] == "!round":
+			utils.send_users_message([user], utils.set_round_message(game.round, game.round_start, game.round_end))
 
-	elif message_words[0] == "!target":
-		for player in game.players_alive:
-			if player.id == user:
-				utils.send_users_message([user], utils.set_target_message(player.target.name))
-				return
-		utils.send_users_message([user], "You have no target - you're dead.")
+		elif message_words[0] == "!status":
+			for player in game.players_alive + game.players_dead:
+				if player.id == user:
+					utils.send_users_message([user], player.get_status_string())
+					return
+			utils.send_users_message([user], "You were never playing! Your status is lame.")
 
-	elif message_words[0] == "!alive":
-		message = "Currently alive: \n"
-		for player in  game.players_alive:
-			message += "%s\n" % player.name
-		utils.send_users_message([user], message)
-
-	elif message_words[0] == "!help":
-		utils.send_users_message([user], utils.create_help_message())
-
-	elif user == game.admin_id and len(message_words) > 0:
-		print("Admin speaking")
-		if message_words[0] == "!round_end" and len(message_words) >= 2:
-			game.end_round(message[len(message_words[0]) + 1:])
-		elif message_words[0] == "!new_round_date" and len(message_words) >= 2:
-			game.round_end = message[len(message_words[0]) + 1:]
-			utils.send_channel_message(game.channel_id, "<!channel>\nThe round end date has been updated to %s!" \
-				% game.round_end)
-		elif message_words[0] == "!will_die":
-			ndie = 0
+		elif message_words[0] == "!target":
 			for player in game.players_alive:
-				if player.has_killed == False:
-					ndie += 1
-			utils.send_users_message([game.admin_id], "%d die, %d total" %  (ndie, len(game.players_alive)))
-		elif message_words[0] == "!set_weapon":
-			game.weapon = message[len(message_words[0]) + 1:]
-			utils.send_channel_message(game.channel_id, "<!channel>\nThe weapon has been updated to %s!" \
-				% game.weapon)
-		elif message_words[0] == "!set_shield":
-			game.shield = message[len(message_words[0]) + 1:]
-			utils.send_channel_message(game.channel_id, "<!channel>\nThe shield has been updated to %s!" \
-				% game.shield)
-		elif message_words[0] == "!set_end_words":
-			game.end_string = message[len(message_words[0]) + 1:]
-		save_game(game)
+				if player.id == user:
+					utils.send_users_message([user], utils.set_target_message(player.target.name))
+					return
+			utils.send_users_message([user], "You have no target - you're dead.")
 
-	else:
-		utils.send_users_message([user], "Unrecognized command! Or maybe unformatted. I'm disappointed." + \
-										 "Message !help for a list of available commands!")
+		elif message_words[0] == "!alive":
+			message = "Currently alive: \n"
+			for player in  game.players_alive:
+				message += "%s\n" % player.name
+			utils.send_users_message([user], message)
 
+		elif message_words[0] == "!help":
+			utils.send_users_message([user], utils.create_help_message())
+
+		elif user == game.admin_id and len(message_words) > 0:
+			print("Admin speaking")
+			print(message_words[0])
+			if message_words[0] == "!round_end" and len(message_words) >= 2:
+				game.end_round(message[len(message_words[0]) + 1:])
+			elif message_words[0] == "!new_round_date" and len(message_words) >= 2:
+				game.round_end = message[len(message_words[0]) + 1:]
+				utils.send_channel_message(game.channel_id, "<!channel>\nThe round end date has been updated to %s!" \
+					% game.round_end)
+			elif message_words[0] == "!will_die":
+				ndie = 0
+				for player in game.players_alive:
+					if player.has_killed == False:
+						ndie += 1
+				utils.send_users_message([game.admin_id], "%d die, %d total" %  (ndie, len(game.players_alive)))
+			elif message_words[0] == "!set_weapon":
+				game.weapon = message[len(message_words[0]) + 1:]
+				utils.send_channel_message(game.channel_id, "<!channel>\nThe weapon has been updated to %s!" \
+					% game.weapon)
+			elif message_words[0] == "!set_shield":
+				game.shield = message[len(message_words[0]) + 1:]
+				utils.send_channel_message(game.channel_id, "<!channel>\nThe shield has been updated to %s!" \
+					% game.shield)
+			elif message_words[0] == "!set_end_words":
+				game.end_string = message[len(message_words[0]) + 1:]
+			save_game(game)
+
+		else:
+			print("throw")
+			utils.send_users_message([user], "Unrecognized command! Or maybe unformatted. I'm disappointed. " + \
+											"Message !help for a list of available commands!")
+	except:
+		print("input error")
 
 if __name__ == "__main__":
 	global game
