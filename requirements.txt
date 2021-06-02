@@ -22,6 +22,6 @@ six==1.14.0
 slack==0.0.2
 slackclient==2.0.0
 slackeventsapi==2.1.0
-urllib3==1.25.8
+urllib3==1.26.5
 Werkzeug==1.0.0
 yarl==1.4.2
