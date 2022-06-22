@@ -13,7 +13,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.1
 MarkupSafe==1.1.1
 multidict==4.7.5
-numpy==1.18.1
+numpy==1.22.0
 pycares==3.1.1
 pycparser==2.19
 pyee==7.0.1
